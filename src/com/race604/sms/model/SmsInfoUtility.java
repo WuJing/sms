@@ -24,32 +24,25 @@ public class SmsInfoUtility {
 		int protocolCol = cusor.getColumnIndex("protocol");
 		int readCol = cusor.getColumnIndex("read");
 		int statusCol = cusor.getColumnIndex("status");
-		int typeCol = cusor.getColumnIndex("body");
+		int typeCol = cusor.getColumnIndex("type");
+		int bodyCol = cusor.getColumnIndex("body");
 		if (cusor != null) {
 			while (cusor.moveToNext()) {
 				SmsInfo smsinfo = new SmsInfo();
 				smsinfo.id = cusor.getInt(idCol);
 				smsinfo.thread_id = cusor.getInt(thread_idCol);
 				smsinfo.address = cusor.getString(addressCol);
+				smsinfo.person = cusor.getString(personCol);
 				smsinfo.date = cusor.getLong(dateCol);
 				smsinfo.protocol = cusor.getInt(protocolCol);
 				smsinfo.read = cusor.getInt(readCol);
 				smsinfo.status = cusor.getInt(statusCol);
 				smsinfo.type = cusor.getInt(typeCol);
-				smsinfo.setDate(cusor.getString(dateColumn));
-				smsinfo.setPhoneNumber(cusor.getString(phoneNumberColumn));
-				smsinfo.setSmsbody(cusor.getString(smsbodyColumn));
-				smsinfo.setType(cusor.getString(typeColumn));
-				infos.add(smsinfo);
+				smsinfo.body = cusor.getString(bodyCol);
+				smsList.add(smsinfo);
 			}
 			cusor.close();
 		}
-
-		
-		cusor.getInt(idCol);
-		
-		
-		
 		return smsList;
 	}
 }

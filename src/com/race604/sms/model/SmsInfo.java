@@ -1,27 +1,24 @@
 package com.race604.sms.model;
 
 public class SmsInfo {
-	// ËùÓĞµÄ¶ÌĞÅ
+	// æ‰€æœ‰çš„çŸ­ä¿¡
 	public static final String SMS_URI_ALL = "content://sms/";
-	// ÊÕ¼şÏä¶ÌĞÅ
+	// æ”¶ä»¶ç®±çŸ­ä¿¡
 	public static final String SMS_URI_INBOX = "content://sms/inbox";
-	// ·¢¼şÏä¶ÌĞÅ
+	// å‘ä»¶ç®±çŸ­ä¿¡
 	public static final String SMS_URI_SEND = "content://sms/sent";
-	// ²İ¸åÏä¶ÌĞÅ
+	// è‰ç¨¿ç®±çŸ­ä¿¡
 	public static final String SMS_URI_DRAFT = "content://sms/draft";
 	
-	public int id; 			// ¶ÌĞÅid
-	public int thread_id; 	// ¶Ô»°µÄĞòºÅ£¬ÓëÍ¬Ò»¸öÊÖ»úºÅ»¥·¢µÄ¶ÌĞÅ£¬ÆäĞòºÅÊÇÏàÍ¬µÄ
-	public String address; 	// ·¢¼şÈËµØÖ·£¬¼´µç»°ºÅÂë
-	public String person; 	// ·¢¼şÈËµÄÃû×Ö£¬Èç¹û·¢¼şÈËÔÚÍ¨Ñ¶Â¼ÖĞÔòÎª¾ßÌåĞÕÃû£¬Ä°ÉúÈËÎªnull
-	public String body; 	// ¶ÌĞÅÄÚÈİ
-	public long   date; 	// ·¢¼şÊ±¼ä
-	public int protocol; 	// Ğ­Òé0 SMS_RPOTO¶ÌĞÅ£¬1 MMS_PROTO²ÊĞÅ
-	public int read; 		// ÊÇ·ñÔÄ¶Á0Î´¶Á£¬1ÒÑ¶Á
-	public int status; 		// ¶ÌĞÅ×´Ì¬-1 ½ÓÊÕ£¬0 complete,64 pending,128 failed
-	public int type; 		// ¶ÌĞÅÀàĞÍ1ÊÇ½ÓÊÕµ½µÄ£¬2ÊÇÒÑ·¢³ö
-	//private String service_center; // ¶ÌĞÅ·şÎñÖĞĞÄºÅÂë±àºÅ£¬Èç+8613800755500
-	
-	
-
+	public int id; 			// çŸ­ä¿¡id
+	public int thread_id; 	// å¯¹è¯çš„åºå·ï¼Œä¸åŒä¸€ä¸ªæ‰‹æœºå·äº’å‘çš„çŸ­ä¿¡ï¼Œå…¶åºå·æ˜¯ç›¸åŒçš„
+	public String address; 	// å‘ä»¶äººåœ°å€ï¼Œå³ç”µè¯å·ç 
+	public String person; 	// å‘ä»¶äººçš„åå­—ï¼Œå¦‚æœå‘ä»¶äººåœ¨é€šè®¯å½•ä¸­åˆ™ä¸ºå…·ä½“å§“åï¼Œé™Œç”Ÿäººä¸ºnull
+	public String body; 	// çŸ­ä¿¡å†…å®¹
+	public long   date; 	// å‘ä»¶æ—¶é—´
+	public int protocol; 	// åè®®0 SMS_RPOTOçŸ­ä¿¡ï¼Œ1 MMS_PROTOå½©ä¿¡
+	public int read; 		// æ˜¯å¦é˜…è¯»0æœªè¯»ï¼Œ1å·²è¯»
+	public int status; 		// çŸ­ä¿¡çŠ¶æ€-1 æ¥æ”¶ï¼Œ0 complete,64 pending,128 failed
+	public int type; 		// çŸ­ä¿¡ç±»å‹1æ˜¯æ¥æ”¶åˆ°çš„ï¼Œ2æ˜¯å·²å‘å‡º
+	//private String service_center; // çŸ­ä¿¡æœåŠ¡ä¸­å¿ƒå·ç ç¼–å·ï¼Œå¦‚+8613800755500
 }
