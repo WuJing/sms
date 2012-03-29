@@ -15,7 +15,6 @@ public class SmsInfoUtility {
 
 		Cursor cusor = context.getContentResolver().query(uri, projection, null,
 				null, "date desc");
-
 		int idCol = cusor.getColumnIndex("_id");
 		int thread_idCol = cusor.getColumnIndex("thread_id");
 		int addressCol = cusor.getColumnIndex("address");
@@ -44,5 +43,21 @@ public class SmsInfoUtility {
 			cusor.close();
 		}
 		return smsList;
+	}
+	
+	public static List<SmsInfo> getSmsAll(Context context) {
+		return getSmsInfo(context, Uri.parse(SmsInfo.SMS_URI_ALL));
+	}
+	
+	public static List<SmsInfo> getSmsInbox(Context context) {
+		return getSmsInfo(context, Uri.parse(SmsInfo.SMS_URI_INBOX));
+	}
+	
+	public static List<SmsInfo> getSmsSend(Context context) {
+		return getSmsInfo(context, Uri.parse(SmsInfo.SMS_URI_SEND));
+	}
+	
+	public static List<SmsInfo> getSmsDraft(Context context) {
+		return getSmsInfo(context, Uri.parse(SmsInfo.SMS_URI_DRAFT));
 	}
 }

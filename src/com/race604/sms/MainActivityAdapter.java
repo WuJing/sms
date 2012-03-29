@@ -51,7 +51,7 @@ public class MainActivityAdapter extends ArrayAdapter<SmsInfo>{
 		
 		ViewHolder holder = (ViewHolder) rowView.getTag();
 		SmsInfo sms = mSmsList.get(position);
-		holder.from.setText(sms.address);
+		holder.from.setText(sms.address + ": " + sms.thread_id);
 		holder.body.setText(sms.body);
 		
 		return rowView;
