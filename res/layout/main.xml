@@ -6,6 +6,7 @@
 
     <ListView android:id="@android:id/list"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"></ListView>
+        android:layout_height="wrap_content"
+        android:layoutAnimation="@anim/layout_list_slide_down"></ListView>
 
 </LinearLayout>

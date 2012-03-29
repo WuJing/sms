@@ -9,6 +9,8 @@ import android.app.Activity;
 import android.app.ListActivity;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ListView;
 
 public class MainActivity extends ListActivity {
@@ -26,5 +28,6 @@ public class MainActivity extends ListActivity {
         List<SmsInfo> smsList = SmsInfoUtility.getSmsInfo(this, Uri.parse(SmsInfo.SMS_URI_ALL));
         
         setListAdapter(new MainActivityAdapter(this, smsList));
+                
     }
 }
