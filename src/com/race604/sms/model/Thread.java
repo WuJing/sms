@@ -5,8 +5,6 @@ package com.race604.sms.model;
  * 
  **/
 public class Thread {
-	public long id; // thread id
-	public long latest; // 最近更新时间
 	public int count; 	// 本thread包含的短信数量
-	public String address;	// 对方用户的电话号码
+	public SmsInfo latest; // 最新的一条短信
 }

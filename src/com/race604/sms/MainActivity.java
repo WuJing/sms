@@ -3,7 +3,7 @@ package com.race604.sms;
 import java.util.List;
 
 import com.race604.sms.model.SmsInfo;
-import com.race604.sms.model.SmsInfoUtility;
+import com.race604.sms.model.Utility;
 
 import android.app.Activity;
 import android.app.ListActivity;
@@ -25,7 +25,7 @@ public class MainActivity extends ListActivity {
         
         mThreadLv = getListView();
         
-        List<SmsInfo> smsList = SmsInfoUtility.getSmsInfo(this, Uri.parse(SmsInfo.SMS_URI_ALL));
+        List<SmsInfo> smsList = Utility.getSmsInfo(this, Uri.parse(SmsInfo.SMS_URI_ALL));
         
         setListAdapter(new MainActivityAdapter(this, smsList));
                 
