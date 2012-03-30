@@ -1,22 +1,31 @@
 package com.race604.sms;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import com.race604.sms.model.SmsInfo;
+import com.race604.sms.MainActivityAdapter.ViewHolder;
+import com.race604.sms.model.SmsThread;
 import com.race604.sms.model.Utility;
 
-import android.app.Activity;
 import android.app.ListActivity;
-import android.net.Uri;
+import android.gesture.Gesture;
+import android.gesture.GestureLibraries;
+import android.gesture.GestureLibrary;
+import android.gesture.GestureOverlayView;
+import android.gesture.GestureOverlayView.OnGesturePerformedListener;
+import android.gesture.Prediction;
+import android.graphics.Color;
+import android.graphics.RectF;
 import android.os.Bundle;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import android.view.View;
 import android.widget.ListView;
+import android.widget.Toast;
 
-public class MainActivity extends ListActivity {
+public class MainActivity extends ListActivity implements OnGesturePerformedListener{
     
-	ListView mThreadLv;
-	
+	private ListView mThreadLv;
+	private GestureLibrary mGestureLib;
+	private View mCurrentView;
 	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -24,10 +33,43 @@ public class MainActivity extends ListActivity {
         setContentView(R.layout.main);
         
         mThreadLv = getListView();
+        List<SmsThread> smsList = Utility.getThreadALL(this);
+        setListAdapter(new MainActivityAdapter(this, smsList));   
         
-        List<SmsInfo> smsList = Utility.getSmsInfo(this, Uri.parse(SmsInfo.SMS_URI_ALL));
+        GestureOverlayView gestureView = (GestureOverlayView) findViewById(R.id.gestures);
+        gestureView.addOnGesturePerformedListener(this);
+        gestureView.setGestureColor(Color.TRANSPARENT);
+        gestureView.setUncertainGestureColor(Color.TRANSPARENT);
+        mGestureLib = GestureLibraries.fromRawResource(this, R.raw.gestures);
+		if (!mGestureLib.load()) {
+			finish();
+		}
         
-        setListAdapter(new MainActivityAdapter(this, smsList));
-                
+		//mThreadLv.setOnTouchListener(this);
     }
+
+	@Override
+	public void onGesturePerformed(GestureOverlayView overlay, Gesture gesture) {
+		ArrayList<Prediction> predictions = mGestureLib.recognize(gesture);
+		
+		if (predictions.size() > 0 && predictions.get(0).score > 1.0) {
+	        String action = predictions.get(0).name;
+	        RectF rect = gesture.getBoundingBox();
+	        int x, y;
+	        x = (int) ((rect.left + rect.right) / 2);
+	        y = (int) ((rect.top + rect.bottom) / 2);
+	        int pos = mThreadLv.pointToPosition(x, y);
+	        mCurrentView = mThreadLv.getChildAt(pos);
+	        if ("right".equals(action)) {
+	        	MainActivityAdapter.ViewHolder holder = (ViewHolder) mCurrentView.getTag();
+	            Toast.makeText(this, "Delet the SMS: " + holder.body.getText(), Toast.LENGTH_SHORT).show();
+//	            Toast.makeText(this, "Delet the SMS: ", Toast.LENGTH_SHORT).show();
+	        } else if ("left".equals(action)) {
+	            Toast.makeText(this, "Removing a contact", Toast.LENGTH_SHORT).show();
+	        } else if ("action_refresh".equals(action)) {
+	            Toast.makeText(this, "Reloading contacts", Toast.LENGTH_SHORT).show();
+	        }
+	    }
+	}
+
 }

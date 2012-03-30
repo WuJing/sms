@@ -1,11 +1,14 @@
 package com.race604.sms.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.ContactsContract;
 
 public class Utility {
 	
@@ -53,7 +56,6 @@ public class Utility {
 	}
 	
 	public static List<SmsInfo> getSmsInbox(Context context) {
-		String sortOrder = "date desc";
 		return getSmsInfo(context, Uri.parse(SmsInfo.SMS_URI_INBOX), null, null, DEFAULT_SORT_ORDER);
 	}
 	
@@ -65,9 +67,52 @@ public class Utility {
 		return getSmsInfo(context, Uri.parse(SmsInfo.SMS_URI_DRAFT), null, null, DEFAULT_SORT_ORDER);
 	}
 	
-	public static List<Thread> getThreadList() {
-		List<Thread> list = new ArrayList<Thread>();
-		
+	public static List<SmsThread> getThreadALL(Context context) {
+		List<SmsThread> list = new ArrayList<SmsThread>();
+		List<SmsInfo> smsList = getSmsAll(context);
+		HashMap<Integer, Integer> threadIds = new HashMap<Integer, Integer>();
+		Integer index;
+		SmsThread thread;
+		for (SmsInfo sms : smsList) {
+			index = threadIds.get(sms.thread_id);
+			if (index == null) {
+				threadIds.put(sms.thread_id, list.size());
+				thread = new SmsThread();
+				thread.count = 1;
+				thread.unread = (sms.read == 0);
+				thread.latest = sms;
+				list.add(thread);
+			} else {
+				thread = list.get(index);
+			}
+			thread.count++;
+			thread.unread |= (sms.read == 0);
+		}
 		return list;
+	}
+	
+	public static ContactInfo getCantactByPhone(Context context, String phone) {
+		String num = phone;
+		if (phone.startsWith("+86")) {
+			num = phone.substring(3);
+		} 
+
+		ContactInfo contact = new ContactInfo();
+		contact.displayName = num;
+		String[] projection = { ContactsContract.PhoneLookup.DISPLAY_NAME,
+				ContactsContract.CommonDataKinds.Phone.NUMBER,
+				ContactsContract.CommonDataKinds.Phone.CONTACT_ID};
+		
+		ContentResolver cr = context.getContentResolver();
+		Cursor pCur = cr.query(
+				 ContactsContract.CommonDataKinds.Phone.CONTENT_URI, projection,
+				 ContactsContract.CommonDataKinds.Phone.NUMBER + " = ?",
+				 new String[] { num }, null);
+		 if (pCur.moveToFirst()) {
+			 contact.displayName = pCur.getString(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+			 contact.contactId = pCur.getLong(pCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
+			 pCur.close();
+		 }
+		 return contact;
 	}
 }
