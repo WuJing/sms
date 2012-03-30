@@ -60,14 +60,25 @@ public class MainActivity extends ListActivity implements OnGesturePerformedList
 	        y = (int) ((rect.top + rect.bottom) / 2);
 	        int pos = mThreadLv.pointToPosition(x, y);
 	        mCurrentView = mThreadLv.getChildAt(pos);
+	        
+	        if (mCurrentView == null) {
+	        	return;
+	        }
+	        
+	        MainActivityAdapter.ViewHolder holder = (ViewHolder) mCurrentView.getTag();
+	        
+	        if (holder == null) {
+	        	return;
+	        }
+	        
 	        if ("right".equals(action)) {
-	        	MainActivityAdapter.ViewHolder holder = (ViewHolder) mCurrentView.getTag();
 	            Toast.makeText(this, "Delet the SMS: " + holder.body.getText(), Toast.LENGTH_SHORT).show();
-//	            Toast.makeText(this, "Delet the SMS: ", Toast.LENGTH_SHORT).show();
 	        } else if ("left".equals(action)) {
-	            Toast.makeText(this, "Removing a contact", Toast.LENGTH_SHORT).show();
-	        } else if ("action_refresh".equals(action)) {
-	            Toast.makeText(this, "Reloading contacts", Toast.LENGTH_SHORT).show();
+	            Toast.makeText(this, "Left: " + holder.body.getText(), Toast.LENGTH_SHORT).show();
+	        } else if ("up".equals(action)) {
+	            Toast.makeText(this, "Up: " + holder.body.getText(), Toast.LENGTH_SHORT).show();
+	        } else if ("down".equals(action)) {
+	        	Toast.makeText(this, "Down: " + holder.body.getText(), Toast.LENGTH_SHORT).show();
 	        }
 	    }
 	}
