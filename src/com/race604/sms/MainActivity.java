@@ -3,6 +3,11 @@ package com.race604.sms;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.actionbarsherlock.app.SherlockListActivity;
+import com.actionbarsherlock.view.ActionMode;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.SubMenu;
 import com.race604.sms.MainActivityAdapter.ViewHolder;
 import com.race604.sms.model.SmsThread;
 import com.race604.sms.model.Utility;
@@ -21,11 +26,14 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class MainActivity extends ListActivity implements OnGesturePerformedListener{
+public class MainActivity extends SherlockListActivity implements OnGesturePerformedListener{
     
+	public static int THEME = 0;
+	
 	private ListView mThreadLv;
 	private GestureLibrary mGestureLib;
 	private View mCurrentView;
+	ActionMode mActionMode;
 	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,7 +53,49 @@ public class MainActivity extends ListActivity implements OnGesturePerformedList
 			finish();
 		}
         
-		//mThreadLv.setOnTouchListener(this);
+    }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+    	
+    	return showAllMenu(menu);
+    	
+    }
+    
+    private boolean showAllMenu(Menu menu) {
+    	boolean isLight = false;
+    	menu.clear();
+    	menu.add(0, R.string.save, 0, R.string.save)
+            .setIcon(isLight ? R.drawable.ic_compose_inverse : R.drawable.ic_compose)
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+        menu.add(0, R.string.search, 0, R.string.search)
+        	.setActionView(R.layout.action_search)
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+
+        return true;
+    }
+    
+    private boolean showSearchMenu(Menu menu) {
+//    	boolean isLight = false;
+//    	menu.clear();
+//    	menu.add("Search")
+//        .setIcon(isLight ? R.drawable.ic_search_inverse : R.drawable.ic_search)
+//        .setActionView(R.layout.collapsible_edittext)
+//        .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+    	return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch(id) {
+        case R.string.save:
+        	break;
+        case R.string.search:
+        	// mActionMode = startActionMode(new MainActivityActionMode());
+        }
+        return true;
     }
 
 	@Override
@@ -82,5 +132,55 @@ public class MainActivity extends ListActivity implements OnGesturePerformedList
 	        }
 	    }
 	}
+	
+	class MainActivityActionMode implements ActionMode.Callback {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            //Used to put dark icons on light action bar
+            boolean isLight = false;
+
+            menu.add("Save")
+                .setIcon(isLight ? R.drawable.ic_compose_inverse : R.drawable.ic_compose)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+            menu.add("Search")
+                .setIcon(isLight ? R.drawable.ic_search_inverse : R.drawable.ic_search)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+            menu.add("Refresh")
+                .setIcon(isLight ? R.drawable.ic_refresh_inverse : R.drawable.ic_refresh)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+            menu.add("Save")
+                .setIcon(isLight ? R.drawable.ic_compose_inverse : R.drawable.ic_compose)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+            menu.add("Search")
+                .setIcon(isLight ? R.drawable.ic_search_inverse : R.drawable.ic_search)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+            menu.add("Refresh")
+                .setIcon(isLight ? R.drawable.ic_refresh_inverse : R.drawable.ic_refresh)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            Toast.makeText(MainActivity.this, "Got click: " + item, Toast.LENGTH_SHORT).show();
+            mode.finish();
+            return true;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+        }
+    }
 
 }

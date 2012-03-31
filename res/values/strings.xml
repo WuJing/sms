@@ -5,4 +5,9 @@
     <string name="app_name">SMS</string>
     <string name="headphoto">Head Photo</string>
 
+    <!-- Action bar menu -->
+    <string name="option">Option</string>
+    <string name="save">Save</string>
+    <string name="edit">Edit</string>
+    <string name="search">Search</string>
 </resources>
