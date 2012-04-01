@@ -76,16 +76,6 @@ public class MainActivity extends SherlockListActivity implements OnGesturePerfo
         return true;
     }
     
-    private boolean showSearchMenu(Menu menu) {
-//    	boolean isLight = false;
-//    	menu.clear();
-//    	menu.add("Search")
-//        .setIcon(isLight ? R.drawable.ic_search_inverse : R.drawable.ic_search)
-//        .setActionView(R.layout.collapsible_edittext)
-//        .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
-    	return true;
-    }
-    
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();

@@ -9,6 +9,7 @@ import com.race604.sms.model.Utility;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ public class MainActivityAdapter extends ArrayAdapter<SmsThread>{
 
 	private final Activity mContext;
 	private final List<SmsThread> mThreadList;
+	private Bitmap mDefaultHead;
 	
 	public MainActivityAdapter(Activity context, List<SmsThread> threadList) {
 		super(context, R.layout.thread_item, threadList);
@@ -64,6 +66,13 @@ public class MainActivityAdapter extends ArrayAdapter<SmsThread>{
 		}
 		
 		Bitmap photo = contact.getPhoto(mContext);
+		if (photo == null) {
+			if (mDefaultHead == null) {
+				mDefaultHead = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_contact);
+			}
+			photo = mDefaultHead;
+		}
+		
 		holder.photo.setImageBitmap(photo);
 		
 		from += " (" + thread.count + ")";
