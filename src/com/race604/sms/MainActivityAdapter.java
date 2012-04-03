@@ -1,5 +1,6 @@
 package com.race604.sms;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.race604.sms.model.ContactInfo;
@@ -29,9 +30,14 @@ public class MainActivityAdapter extends ArrayAdapter<SmsThread>{
 	private Bitmap mDefaultHead;
 	
 	public MainActivityAdapter(Activity context, List<SmsThread> threadList) {
-		super(context, R.layout.thread_item, threadList);
+		super(context, R.layout.main_item, threadList);
 		mThreadList = threadList;
 		mContext = context;
+	}
+	
+	@Override
+	public SmsThread getItem(int position) {
+		return mThreadList.get(position);
 	}
 
 	@Override
@@ -39,9 +45,10 @@ public class MainActivityAdapter extends ArrayAdapter<SmsThread>{
 		super.add(object);
 		mThreadList.add(object);
 	}
-	
-	public void addAll(List<SmsThread> threadList) {
-		mThreadList.addAll(threadList);
+
+	@Override
+	public void addAll(Collection<? extends SmsThread> collection) {
+		mThreadList.addAll(collection);
 	}
 
 	@Override
@@ -49,7 +56,7 @@ public class MainActivityAdapter extends ArrayAdapter<SmsThread>{
 		View rowView = convertView;
 		if (rowView == null) {
 			LayoutInflater inflater = mContext.getLayoutInflater();
-			rowView = inflater.inflate(R.layout.thread_item, null);
+			rowView = inflater.inflate(R.layout.main_item, null);
 			ViewHolder viewHolder = new ViewHolder();
 			viewHolder.from = (TextView) rowView.findViewById(R.id.fromTv);
 			viewHolder.body = (TextView) rowView.findViewById(R.id.bodyTv);
@@ -82,10 +89,10 @@ public class MainActivityAdapter extends ArrayAdapter<SmsThread>{
 		return rowView;
 	}
 	
-	public class ViewHolder {
+	public static class ViewHolder {
 		public TextView from;
 		public TextView body;
 		public ImageView photo;
-	}	
+	}
 	
 }

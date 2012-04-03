@@ -10,8 +10,8 @@ public class SmsInfo {
 	// 草稿箱短信
 	public static final String SMS_URI_DRAFT = "content://sms/draft";
 	
-	public int id; 			// 短信id
-	public int thread_id; 	// 对话的序号，与同一个手机号互发的短信，其序号是相同的
+	public long id; 			// 短信id
+	public long thread_id; 	// 对话的序号，与同一个手机号互发的短信，其序号是相同的
 	public String address; 	// 发件人地址，即电话号码
 	public String person; 	// 发件人的名字，如果发件人在通讯录中则为具体姓名，陌生人为null
 	public String body; 	// 短信内容

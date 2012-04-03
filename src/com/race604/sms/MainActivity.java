@@ -8,11 +8,11 @@ import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.SubMenu;
-import com.race604.sms.MainActivityAdapter.ViewHolder;
 import com.race604.sms.model.SmsThread;
 import com.race604.sms.model.Utility;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.gesture.Gesture;
 import android.gesture.GestureLibraries;
 import android.gesture.GestureLibrary;
@@ -23,17 +23,20 @@ import android.graphics.Color;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class MainActivity extends SherlockListActivity implements OnGesturePerformedListener{
+public class MainActivity extends SherlockListActivity implements OnGesturePerformedListener, OnItemClickListener{
     
 	public static int THEME = 0;
 	
 	private ListView mThreadLv;
 	private GestureLibrary mGestureLib;
 	private View mCurrentView;
-	ActionMode mActionMode;
+	private ArrayAdapter<SmsThread> mListAdapter;
 	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,7 +45,8 @@ public class MainActivity extends SherlockListActivity implements OnGesturePerfo
         
         mThreadLv = getListView();
         List<SmsThread> smsList = Utility.getThreadALL(this);
-        setListAdapter(new MainActivityAdapter(this, smsList));   
+        mListAdapter = new MainActivityAdapter(this, smsList);
+        setListAdapter(mListAdapter);   
         
         GestureOverlayView gestureView = (GestureOverlayView) findViewById(R.id.gestures);
         gestureView.addOnGesturePerformedListener(this);
@@ -52,7 +56,8 @@ public class MainActivity extends SherlockListActivity implements OnGesturePerfo
 		if (!mGestureLib.load()) {
 			finish();
 		}
-        
+		
+		mThreadLv.setOnItemClickListener(this);
     }
     
     @Override
@@ -105,7 +110,7 @@ public class MainActivity extends SherlockListActivity implements OnGesturePerfo
 	        	return;
 	        }
 	        
-	        MainActivityAdapter.ViewHolder holder = (ViewHolder) mCurrentView.getTag();
+	        MainActivityAdapter.ViewHolder holder = (MainActivityAdapter.ViewHolder) mCurrentView.getTag();
 	        
 	        if (holder == null) {
 	        	return;
@@ -172,5 +177,13 @@ public class MainActivity extends SherlockListActivity implements OnGesturePerfo
         public void onDestroyActionMode(ActionMode mode) {
         }
     }
+
+	@Override
+	public void onItemClick(AdapterView<?> arg0, View view, int position, long arg3) {
+		Intent intent = new Intent(MainActivity.this, ThreadActivity.class);
+		SmsThread thread = mListAdapter.getItem(position);
+		intent.putExtra("id", thread.latest.thread_id);
+		startActivity(intent);
+	}
 
 }

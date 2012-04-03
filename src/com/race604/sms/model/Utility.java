@@ -70,7 +70,7 @@ public class Utility {
 	public static List<SmsThread> getThreadALL(Context context) {
 		List<SmsThread> list = new ArrayList<SmsThread>();
 		List<SmsInfo> smsList = getSmsAll(context);
-		HashMap<Integer, Integer> threadIds = new HashMap<Integer, Integer>();
+		HashMap<Long, Integer> threadIds = new HashMap<Long, Integer>();
 		Integer index;
 		SmsThread thread;
 		for (SmsInfo sms : smsList) {
@@ -78,7 +78,7 @@ public class Utility {
 			if (index == null) {
 				threadIds.put(sms.thread_id, list.size());
 				thread = new SmsThread();
-				thread.count = 1;
+				thread.count = 0;
 				thread.unread = (sms.read == 0);
 				thread.latest = sms;
 				list.add(thread);
@@ -89,6 +89,12 @@ public class Utility {
 			thread.unread |= (sms.read == 0);
 		}
 		return list;
+	}
+	
+	public static List<SmsInfo> getSmsAllByThreadId(Context context, long thread_id) {
+		return getSmsInfo(context, Uri.parse(SmsInfo.SMS_URI_ALL), 
+				"thread_id = ?", new String[] { String.valueOf(thread_id) },
+				Utility.DEFAULT_SORT_ORDER);
 	}
 	
 	public static ContactInfo getCantactByPhone(Context context, String phone) {
