@@ -55,7 +55,7 @@ public class ThreadActivity extends SherlockListActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
         switch(id) {
-        case 16908332: // home button
+        case android.R.id.home: // home button
         	finish();
         	break;
         case R.string.search:
