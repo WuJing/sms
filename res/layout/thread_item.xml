@@ -18,12 +18,14 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:textColor="#888888"
-            android:textSize="10sp"/>
+            android:textSize="10sp"
+            />
     </RelativeLayout>
     
 	<TextView android:id="@+id/sms_tv"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textColor="#0099CC" />
+        android:textColor="#0099CC"
+        android:layout_marginLeft="10dp" />
 
 </LinearLayout>

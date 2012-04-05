@@ -4,6 +4,8 @@
     <string name="hello">Hello World, SMSActivity!</string>
     <string name="app_name">SMS</string>
     <string name="headphoto">Head Photo</string>
+    <string name="smshint">Input SMS</string>
+    <string name="send">Send</string>
     
     <string name="me">I</string>
     <string name="say">Said</string>

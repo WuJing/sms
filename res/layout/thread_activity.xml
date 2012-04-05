@@ -7,21 +7,48 @@
     
     android:gestureStrokeType="multiple"
     android:eventsInterceptionEnabled="true"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:gestureColor="#00000000"
+    android:uncertainGestureColor="#00000000">
 
-	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	    android:layout_width="fill_parent"
 	    android:layout_height="fill_parent"
 	    android:orientation="vertical" >
 	
-	    <ListView android:id="@android:id/list"
+	    <LinearLayout android:id="@+id/ll_bottom"
 	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:orientation="horizontal"
+	        android:gravity="center_horizontal"
+	        android:background="#000000"
+	        android:layout_alignParentBottom="true">
+	        
+	        <EditText android:id="@+id/et_smsinput"
+	        android:layout_width="0dp"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="1"
+	        android:hint="@string/smshint"
+	        android:minLines="1" />
+	        
+	        <Button android:id="@+id/bt_send"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="@string/send"/>
+	        
+	    </LinearLayout>	    
+	    
+	    <ListView android:id="@android:id/list"
+	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layoutAnimation="@anim/layout_list_slide_down"
 	        android:divider="#996699AA"
 	        android:dividerHeight="1dp"
-	    	android:background="#000000"></ListView>
-	
-	</LinearLayout>
+	    	android:background="#000000"
+	    	android:layout_above="@id/ll_bottom"
+	        android:stackFromBottom="true"
+			android:transcriptMode="alwaysScroll"></ListView>
+	    
+	</RelativeLayout>
 
 </android.gesture.GestureOverlayView>

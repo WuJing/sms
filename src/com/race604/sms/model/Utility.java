@@ -9,10 +9,15 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.telephony.SmsManager;
 
 public class Utility {
 	
-	public static final String DEFAULT_SORT_ORDER = "date DESC";
+	
+	public static final String DESC_SORT_ORDER = "date DESC";
+	public static final String ASC_SORT_ORDER = "date ASC";
+	
+	public static final String DEFAULT_SORT_ORDER = DESC_SORT_ORDER;
 	
 	public static List<SmsInfo> getSmsInfo(Context context, Uri uri, String selection, String[] selectionArgs, String sortOrder) {
 		List<SmsInfo> smsList = new ArrayList<SmsInfo>();
@@ -94,7 +99,7 @@ public class Utility {
 	public static List<SmsInfo> getSmsAllByThreadId(Context context, long thread_id) {
 		return getSmsInfo(context, Uri.parse(SmsInfo.SMS_URI_ALL), 
 				"thread_id = ?", new String[] { String.valueOf(thread_id) },
-				Utility.DEFAULT_SORT_ORDER);
+				Utility.ASC_SORT_ORDER);
 	}
 	
 	public static ContactInfo getCantactByPhone(Context context, String phone) {
@@ -120,5 +125,22 @@ public class Utility {
 			 pCur.close();
 		 }
 		 return contact;
+	}
+	
+	public static int sendMms(String phone, String message) {
+		int ret = 0;
+		if (message == null || message.trim().length() == 0) {
+			return 0;
+		}
+		SmsManager smsManager = SmsManager.getDefault();
+		// 如果短信没有超过限制长度，则返回一个长度的List。
+		List<String> texts = smsManager.divideMessage(message);
+
+		for (String text : texts) {
+			smsManager.sendTextMessage(phone, null, text, null, null);
+			ret++;
+		}
+		return ret;
+		
 	}
 }
