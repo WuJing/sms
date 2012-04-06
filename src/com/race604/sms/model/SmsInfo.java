@@ -10,7 +10,7 @@ public class SmsInfo {
 	// 草稿箱短信
 	public static final String SMS_URI_DRAFT = "content://sms/draft";
 	
-	public long id; 			// 短信id
+	public long id; 		// 短信id
 	public long thread_id; 	// 对话的序号，与同一个手机号互发的短信，其序号是相同的
 	public String address; 	// 发件人地址，即电话号码
 	public String person; 	// 发件人的名字，如果发件人在通讯录中则为具体姓名，陌生人为null
@@ -21,4 +21,9 @@ public class SmsInfo {
 	public int status; 		// 短信状态-1 接收，0 complete,64 pending,128 failed
 	public int type; 		// 短信类型1是接收到的，2是已发出
 	//private String service_center; // 短信服务中心号码编号，如+8613800755500
+	
+	public static int STATUS_NONE = -1;
+	public static int STATUS_COMPLETED = 0;
+	public static int STATUS_PENDING = 64;
+	public static int STATUS_FAILED = 128;
 }

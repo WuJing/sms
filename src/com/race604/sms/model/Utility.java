@@ -4,8 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.race604.sms.ThreadActivity;
+
+import android.app.PendingIntent;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
@@ -127,17 +132,47 @@ public class Utility {
 		 return contact;
 	}
 	
-	public static int sendMms(String phone, String message) {
+	public static Uri saveSentSms(Context context, String address, String body) {
+		ContentValues values = new ContentValues(); 
+		values.put("address", address); 
+		values.put("body", body);
+		values.put("status", SmsInfo.STATUS_NONE);
+		return context.getContentResolver().insert(Uri.parse(SmsInfo.SMS_URI_SEND), values);
+	}
+	
+	public static int updateSmsStatus(Context context, Uri uri, int status) {
+		ContentValues values = new ContentValues();
+		values.put("status", status);
+		return context.getContentResolver().update(uri, values, null, null);
+	}
+	
+	public static int sendSms(Context context,String phone, String message) {
+
 		int ret = 0;
 		if (message == null || message.trim().length() == 0) {
 			return 0;
 		}
+			
 		SmsManager smsManager = SmsManager.getDefault();
 		// 如果短信没有超过限制长度，则返回一个长度的List。
 		List<String> texts = smsManager.divideMessage(message);
 
+		PendingIntent sentPI;
+		PendingIntent deliveredPI;
+		
 		for (String text : texts) {
-			smsManager.sendTextMessage(phone, null, text, null, null);
+			Uri uri = saveSentSms(context, phone, text);
+			Intent intent = new Intent(ThreadActivity.SENT);
+			intent.setData(uri);
+			sentPI = PendingIntent.getBroadcast(context, 0,
+					intent, 0);
+		 
+			intent = new Intent(ThreadActivity.DELIVERED);
+			intent.setData(uri);
+		    deliveredPI = PendingIntent.getBroadcast(context, 0,
+		    		intent, 0);
+			
+			smsManager.sendTextMessage(phone, null, text, sentPI, deliveredPI);
 			ret++;
 		}
 		return ret;
