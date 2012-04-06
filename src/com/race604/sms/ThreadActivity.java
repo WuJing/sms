@@ -82,7 +82,7 @@ public class ThreadActivity extends SherlockListActivity implements
 		case R.id.bt_send: {
 			String message = mMessageEt.getText().toString();
 			String phone = mList.get(0).address;
-			Utility.sendMms(phone, message);
+			Utility.sendMms(ThreadActivity.this, phone, message);
 			
 			mMessageEt.setText("");
 			mMessageEt.clearFocus();
