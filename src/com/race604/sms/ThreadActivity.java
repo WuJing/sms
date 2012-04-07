@@ -21,6 +21,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
@@ -56,7 +57,10 @@ public class ThreadActivity extends SherlockListActivity implements
 			mAdapter.setContactName(Utility.getCantactByPhone(this,
 					mList.get(0).address).displayName);
 		}
-
+		
+		ActionBar action_bar = getSupportActionBar();
+		action_bar.setTitle(mAdapter.getContactName());
+		
 		mSmsLv = getListView();
 		mSmsLv.setAdapter(mAdapter);
 
@@ -73,27 +77,27 @@ public class ThreadActivity extends SherlockListActivity implements
 				Context context = getBaseContext();
 				switch (getResultCode()) {
 				case Activity.RESULT_OK:
-					Toast.makeText(context, "SMS sent", Toast.LENGTH_SHORT)
+					Toast.makeText(context, R.string.sent, Toast.LENGTH_SHORT)
 							.show();
 					 Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_PENDING);
 					break;
 				case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-					Toast.makeText(getBaseContext(), "Generic failure",
+					Toast.makeText(getBaseContext(), R.string.failure_generic,
 							Toast.LENGTH_SHORT).show();
 					 Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
 					break;
 				case SmsManager.RESULT_ERROR_NO_SERVICE:
-					Toast.makeText(getBaseContext(), "No service",
+					Toast.makeText(getBaseContext(), R.string.failure_noservice,
 							Toast.LENGTH_SHORT).show();
 					Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
 					break;
 				case SmsManager.RESULT_ERROR_NULL_PDU:
-					Toast.makeText(getBaseContext(), "Null PDU",
+					Toast.makeText(getBaseContext(), R.string.failure_nullpdu,
 							Toast.LENGTH_SHORT).show();
 					 Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
 					break;
 				case SmsManager.RESULT_ERROR_RADIO_OFF:
-					Toast.makeText(getBaseContext(), "Radio off",
+					Toast.makeText(getBaseContext(), R.string.failure_radiooff,
 							Toast.LENGTH_SHORT).show();
 					 Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
 					break;
@@ -109,12 +113,12 @@ public class ThreadActivity extends SherlockListActivity implements
 				Context context = getBaseContext();
 				switch (getResultCode()) {
 				case Activity.RESULT_OK:
-					Toast.makeText(getBaseContext(), "SMS delivered",
+					Toast.makeText(getBaseContext(), R.string.delivered,
 							Toast.LENGTH_SHORT).show();
 					 Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_COMPLETED);
 					break;
 				case Activity.RESULT_CANCELED:
-					Toast.makeText(getBaseContext(), "SMS not delivered",
+					Toast.makeText(getBaseContext(), R.string.failure_canceled,
 							Toast.LENGTH_SHORT).show();
 					 Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
 					break;

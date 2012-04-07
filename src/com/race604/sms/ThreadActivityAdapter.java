@@ -35,6 +35,10 @@ public class ThreadActivityAdapter  extends ArrayAdapter<SmsInfo>{
 		mName = name;
 	}
 	
+	public String getContactName() {
+		return mName;
+	}
+	
 	@Override
 	public void add(SmsInfo object) {
 		mList.add(object);

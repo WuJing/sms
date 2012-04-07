@@ -15,4 +15,14 @@
     <string name="save">Save</string>
     <string name="edit">Edit</string>
     <string name="search">Search</string>
+    
+    <!-- SMS send hint -->
+    <string name="sent">SMS was sent</string>
+    <string name="delivered">SMS was delivered</string>
+    <string name="failure_generic">Generic failure</string>
+    <string name="failure_noservice">No service</string>
+    <string name="failure_nullpdu">Null PDU</string>
+    <string name="failure_radiooff">Radio off</string>
+    <string name="failure_canceled">SMS not delivered</string>
+
 </resources>
