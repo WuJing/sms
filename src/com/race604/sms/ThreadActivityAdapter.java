@@ -1,5 +1,6 @@
 package com.race604.sms;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -26,7 +27,11 @@ public class ThreadActivityAdapter  extends ArrayAdapter<SmsInfo>{
 	
 	public ThreadActivityAdapter(Activity context, List<SmsInfo> smsList) {
 		super(context, R.layout.thread_item, smsList);
-		mList = smsList;
+		if (smsList == null) {
+			mList = new ArrayList<SmsInfo>();
+		} else {
+			mList = smsList;
+		}
 		mContext = context;
 		mInflater = mContext.getLayoutInflater();
 	}

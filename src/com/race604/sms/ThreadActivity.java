@@ -30,14 +30,12 @@ import com.race604.sms.model.Utility;
 
 public class ThreadActivity extends SherlockListActivity implements
 		OnClickListener {
-	
-	
+
 	public static String SENT = "SMS_SENT";
 	public static String DELIVERED = "SMS_DELIVERED";
 	public static String SMS_URI = "sms_uri";
 
 	private long thread_id;
-	private List<SmsInfo> mList;
 	private ThreadActivityAdapter mAdapter;
 	private ListView mSmsLv;
 	private Button mSentBtn;
@@ -49,18 +47,17 @@ public class ThreadActivity extends SherlockListActivity implements
 
 		setContentView(R.layout.thread_activity);
 
-		thread_id = getIntent().getExtras().getLong("id");
-		mList = Utility.getSmsAllByThreadId(this, thread_id);
-		mAdapter = new ThreadActivityAdapter(this, mList);
-
-		if (mList.size() > 0) {
-			mAdapter.setContactName(Utility.getCantactByPhone(this,
-					mList.get(0).address).displayName);
+		thread_id = getIntent().getExtras().getLong("id", -1);
+		if (thread_id == -1) {
+			finish();
+			return;
 		}
-		
+
+		showThread(thread_id);
+
 		ActionBar action_bar = getSupportActionBar();
 		action_bar.setTitle(mAdapter.getContactName());
-		
+
 		mSmsLv = getListView();
 		mSmsLv.setAdapter(mAdapter);
 
@@ -68,38 +65,40 @@ public class ThreadActivity extends SherlockListActivity implements
 		mSentBtn.setOnClickListener(this);
 
 		mMessageEt = (EditText) findViewById(R.id.et_smsinput);
-		
+
 		// ---when the SMS has been sent---
 		registerReceiver(new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context arg0, Intent intent) {
-				Uri uri = (Uri) intent.getExtras().get(SMS_URI);
+				Uri uri = intent.getParcelableExtra(SMS_URI);
 				Context context = getBaseContext();
 				switch (getResultCode()) {
 				case Activity.RESULT_OK:
 					Toast.makeText(context, R.string.sent, Toast.LENGTH_SHORT)
 							.show();
-					 Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_PENDING);
+					Utility.updateSmsStatus(context, uri,
+							SmsInfo.STATUS_PENDING);
 					break;
 				case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
 					Toast.makeText(getBaseContext(), R.string.failure_generic,
 							Toast.LENGTH_SHORT).show();
-					 Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
+					Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
 					break;
 				case SmsManager.RESULT_ERROR_NO_SERVICE:
-					Toast.makeText(getBaseContext(), R.string.failure_noservice,
-							Toast.LENGTH_SHORT).show();
+					Toast.makeText(getBaseContext(),
+							R.string.failure_noservice, Toast.LENGTH_SHORT)
+							.show();
 					Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
 					break;
 				case SmsManager.RESULT_ERROR_NULL_PDU:
 					Toast.makeText(getBaseContext(), R.string.failure_nullpdu,
 							Toast.LENGTH_SHORT).show();
-					 Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
+					Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
 					break;
 				case SmsManager.RESULT_ERROR_RADIO_OFF:
 					Toast.makeText(getBaseContext(), R.string.failure_radiooff,
 							Toast.LENGTH_SHORT).show();
-					 Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
+					Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
 					break;
 				}
 			}
@@ -109,23 +108,24 @@ public class ThreadActivity extends SherlockListActivity implements
 		registerReceiver(new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context arg0, Intent intent) {
-				Uri uri = (Uri) intent.getExtras().get(SMS_URI);
+				Uri uri = intent.getParcelableExtra(SMS_URI);
 				Context context = getBaseContext();
 				switch (getResultCode()) {
 				case Activity.RESULT_OK:
 					Toast.makeText(getBaseContext(), R.string.delivered,
 							Toast.LENGTH_SHORT).show();
-					 Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_COMPLETED);
+					Utility.updateSmsStatus(context, uri,
+							SmsInfo.STATUS_COMPLETED);
 					break;
 				case Activity.RESULT_CANCELED:
 					Toast.makeText(getBaseContext(), R.string.failure_canceled,
 							Toast.LENGTH_SHORT).show();
-					 Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
+					Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
 					break;
 				}
 			}
 		}, new IntentFilter(DELIVERED));
-		
+
 	}
 
 	@Override
@@ -155,55 +155,95 @@ public class ThreadActivity extends SherlockListActivity implements
 
 	@Override
 	public void onClick(View v) {
-		switch(v.getId()) {
+		switch (v.getId()) {
 		case R.id.bt_send: {
 			String message = mMessageEt.getText().toString();
-			
+
 			if (message == null || message.length() == 0) {
 				return;
 			}
-			
-			String phone = mList.get(0).address;
-			
+
+			String phone = mAdapter.getItem(0).address;
+
 			SmsManager smsManager = SmsManager.getDefault();
 			// 如果短信没有超过限制长度，则返回一个长度的List。
 			List<String> texts = smsManager.divideMessage(message);
 
 			PendingIntent sentPI;
 			PendingIntent deliveredPI;
-			
+
 			for (String text : texts) {
 				Uri uri = Utility.saveSentSms(ThreadActivity.this, phone, text);
-				
-				String auth = uri.getAuthority();
-				String schema = uri.getScheme();
-				String host = uri.getHost();
-				int port = uri.getPort();
-				String path = uri.getPath();
+
 				SmsInfo sms = Utility.getASmsInfo(ThreadActivity.this, uri);
 				mAdapter.add(sms);
-				Intent intent = new Intent(SENT, uri);
-				intent.putExtra(SMS_URI, uri);
-				sentPI = PendingIntent.getBroadcast(ThreadActivity.this, 0,
-						intent, 0);
-			 
-				intent = new Intent(DELIVERED);
-				intent.putExtra(SMS_URI, uri);
-			    deliveredPI = PendingIntent.getBroadcast(ThreadActivity.this, 0,
-			    		new Intent(DELIVERED, uri), 0);
+				Bundle bundle = new Bundle();
+				bundle.putParcelable(SMS_URI, uri);
 				
-				smsManager.sendTextMessage(phone, null, text, sentPI, deliveredPI);
+				Intent intent = new Intent(SENT);
+				intent.putExtras(bundle);
+				sentPI = PendingIntent.getBroadcast(ThreadActivity.this, 0,
+						intent, PendingIntent.FLAG_UPDATE_CURRENT);
+				
+				intent = new Intent(DELIVERED);
+				intent.putExtras(bundle);
+				deliveredPI = PendingIntent.getBroadcast(ThreadActivity.this,
+						0, intent, PendingIntent.FLAG_ONE_SHOT);
+
+				smsManager.sendTextMessage(phone, null, text, sentPI,
+						deliveredPI);
 			}
 			mAdapter.notifyDataSetChanged();
-			
+
 			mMessageEt.setText("");
 			mMessageEt.clearFocus();
 			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 			imm.hideSoftInputFromWindow(mMessageEt.getWindowToken(), 0);
 			break;
 		}
-			
+
 		}
-		
+
 	}
+
+	public long getThreadId() {
+		return this.thread_id;
+	}
+
+	public void addSmsInfo(SmsInfo sms) {
+		mAdapter.add(sms);
+		mAdapter.notifyDataSetChanged();
+	}
+
+	public void showThread(long thread_id) {
+		this.thread_id = thread_id;
+
+		if (mAdapter == null) {
+			mAdapter = new ThreadActivityAdapter(this, null);
+		}
+
+		List<SmsInfo> list = Utility.getSmsAllByThreadId(this, thread_id);
+		if (list.size() <= 0) {
+			finish();
+			return;
+		}
+		mAdapter.setContactName(Utility.getCantactByPhone(this,
+				list.get(0).address).displayName);
+
+		mAdapter.addAll(list);
+		mAdapter.notifyDataSetChanged();
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		SmsApplication.get().setCurrentActivity(null);
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		SmsApplication.get().setCurrentActivity(ThreadActivity.this);
+	}
+
 }

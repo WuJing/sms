@@ -26,4 +26,5 @@ public class SmsInfo {
 	public static int STATUS_COMPLETED = 0;
 	public static int STATUS_PENDING = 64;
 	public static int STATUS_FAILED = 128;
+	
 }

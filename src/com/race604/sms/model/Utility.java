@@ -15,6 +15,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.telephony.SmsManager;
+import android.telephony.SmsMessage;
 
 public class Utility {
 	
@@ -24,12 +25,14 @@ public class Utility {
 	
 	public static final String DEFAULT_SORT_ORDER = DESC_SORT_ORDER;
 	
-	public static List<SmsInfo> getSmsInfo(Context context, Uri uri, String selection, String[] selectionArgs, String sortOrder) {
+	public static String[] SMS_PROJECTION = new String[] { "_id", "thread_id", "address",
+			"person", "date", "protocol", "read", "status", "type", "body" };
+	
+	public static List<SmsInfo> getSmsInfo(Context context, Uri uri, String selection, String[] selectionArgs, String sortOrder, int maxCount) {
 		List<SmsInfo> smsList = new ArrayList<SmsInfo>();
-		String[] projection = new String[] { "_id", "thread_id", "address",
-				"person", "date", "protocol", "read", "status", "type", "body" };
+		
 
-		Cursor cusor = context.getContentResolver().query(uri, projection, selection,
+		Cursor cusor = context.getContentResolver().query(uri, SMS_PROJECTION, selection,
 				selectionArgs, sortOrder);
 		int idCol = cusor.getColumnIndex("_id");
 		int thread_idCol = cusor.getColumnIndex("thread_id");
@@ -41,6 +44,8 @@ public class Utility {
 		int statusCol = cusor.getColumnIndex("status");
 		int typeCol = cusor.getColumnIndex("type");
 		int bodyCol = cusor.getColumnIndex("body");
+		
+		int count = 0;
 		if (cusor != null) {
 			while (cusor.moveToNext()) {
 				SmsInfo smsinfo = new SmsInfo();
@@ -55,10 +60,19 @@ public class Utility {
 				smsinfo.type = cusor.getInt(typeCol);
 				smsinfo.body = cusor.getString(bodyCol);
 				smsList.add(smsinfo);
+				
+				count++;
+				if(maxCount > 0 && count >= maxCount) {
+					break;
+				}
 			}
 			cusor.close();
 		}
 		return smsList;
+	}
+	
+	public static List<SmsInfo> getSmsInfo(Context context, Uri uri, String selection, String[] selectionArgs, String sortOrder) {
+		return getSmsInfo(context, uri, selection, selectionArgs, sortOrder, 0);
 	}
 	
 	public static SmsInfo getASmsInfo(Context context, Uri uri) {
@@ -116,6 +130,17 @@ public class Utility {
 				Utility.ASC_SORT_ORDER);
 	}
 	
+
+	public static long getThreadIdByPhone(Context context, String phone) {
+		List<SmsInfo> list = getSmsInfo(context, Uri.parse(SmsInfo.SMS_URI_ALL),
+				"address = ? ", new String[] {phone}, Utility.DESC_SORT_ORDER);
+		if (list.size() <= 0) {
+			return -1;
+		} else {
+			return list.get(0).thread_id;
+		}
+	}
+	
 	public static ContactInfo getCantactByPhone(Context context, String phone) {
 		String num = phone;
 		if (phone.startsWith("+86")) {
@@ -149,11 +174,26 @@ public class Utility {
 		return context.getContentResolver().insert(Uri.parse(SmsInfo.SMS_URI_SEND), values);
 	}
 	
+	public static Uri saveReceivedSms(Context context, String address, String body) {
+		ContentValues values = new ContentValues(); 
+		values.put("address", address); 
+		values.put("body", body);
+		values.put("status", SmsInfo.STATUS_NONE);
+		return context.getContentResolver().insert(Uri.parse(SmsInfo.SMS_URI_INBOX), values);
+	}
+	
 	public static int updateSmsStatus(Context context, Uri uri, int status) {
 		ContentValues values = new ContentValues();
 		values.put("status", status);
 		return context.getContentResolver().update(uri, values, null, null);
 	}
 	
+	public static SmsInfo parseSmsMessage(SmsMessage message) {
+		SmsInfo sms = new SmsInfo();
+		sms.address = message.getOriginatingAddress();
+		sms.body = message.getMessageBody();
+		
+		return sms;
+	}
 	
 }
