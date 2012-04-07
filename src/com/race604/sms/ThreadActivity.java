@@ -8,8 +8,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.IntentFilter.MalformedMimeTypeException;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.PatternMatcher;
 import android.telephony.SmsManager;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -31,6 +33,7 @@ public class ThreadActivity extends SherlockListActivity implements
 	
 	public static String SENT = "SMS_SENT";
 	public static String DELIVERED = "SMS_DELIVERED";
+	public static String SMS_URI = "sms_uri";
 
 	private long thread_id;
 	private List<SmsInfo> mList;
@@ -62,64 +65,63 @@ public class ThreadActivity extends SherlockListActivity implements
 
 		mMessageEt = (EditText) findViewById(R.id.et_smsinput);
 		
-		//---when the SMS has been sent---
-        registerReceiver(new BroadcastReceiver(){
-            @Override
-            public void onReceive(Context arg0, Intent intent) {
-            	Uri uri = intent.getData();
-            	Context context = getBaseContext();
-                switch (getResultCode())
-                {
-                    case Activity.RESULT_OK:
-                        Toast.makeText(context, "SMS sent", 
-                                Toast.LENGTH_SHORT).show();
-                        Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_PENDING);
-                        break;
-                    case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                        Toast.makeText(getBaseContext(), "Generic failure", 
-                                Toast.LENGTH_SHORT).show();
-                        Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
-                        break;
-                    case SmsManager.RESULT_ERROR_NO_SERVICE:
-                        Toast.makeText(getBaseContext(), "No service", 
-                                Toast.LENGTH_SHORT).show();
-                        Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
-                        break;
-                    case SmsManager.RESULT_ERROR_NULL_PDU:
-                        Toast.makeText(getBaseContext(), "Null PDU", 
-                                Toast.LENGTH_SHORT).show();
-                        Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
-                        break;
-                    case SmsManager.RESULT_ERROR_RADIO_OFF:
-                        Toast.makeText(getBaseContext(), "Radio off", 
-                                Toast.LENGTH_SHORT).show();
-                        Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
-                        break;
-                }
-            }
-        }, new IntentFilter(SENT));
- 
-        //---when the SMS has been delivered---
-        registerReceiver(new BroadcastReceiver(){
-            @Override
-            public void onReceive(Context arg0, Intent intent) {
-            	Uri uri = intent.getData();
-            	Context context = getBaseContext();
-                switch (getResultCode())
-                {
-                    case Activity.RESULT_OK:
-                        Toast.makeText(getBaseContext(), "SMS delivered", 
-                                Toast.LENGTH_SHORT).show();
-                        Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_COMPLETED);
-                        break;
-                    case Activity.RESULT_CANCELED:
-                        Toast.makeText(getBaseContext(), "SMS not delivered", 
-                                Toast.LENGTH_SHORT).show();
-                        Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
-                        break;                        
-                }
-            }
-        }, new IntentFilter(DELIVERED));
+		// ---when the SMS has been sent---
+		registerReceiver(new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context arg0, Intent intent) {
+				Uri uri = (Uri) intent.getExtras().get(SMS_URI);
+				Context context = getBaseContext();
+				switch (getResultCode()) {
+				case Activity.RESULT_OK:
+					Toast.makeText(context, "SMS sent", Toast.LENGTH_SHORT)
+							.show();
+					 Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_PENDING);
+					break;
+				case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+					Toast.makeText(getBaseContext(), "Generic failure",
+							Toast.LENGTH_SHORT).show();
+					 Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
+					break;
+				case SmsManager.RESULT_ERROR_NO_SERVICE:
+					Toast.makeText(getBaseContext(), "No service",
+							Toast.LENGTH_SHORT).show();
+					Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
+					break;
+				case SmsManager.RESULT_ERROR_NULL_PDU:
+					Toast.makeText(getBaseContext(), "Null PDU",
+							Toast.LENGTH_SHORT).show();
+					 Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
+					break;
+				case SmsManager.RESULT_ERROR_RADIO_OFF:
+					Toast.makeText(getBaseContext(), "Radio off",
+							Toast.LENGTH_SHORT).show();
+					 Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
+					break;
+				}
+			}
+		}, new IntentFilter(SENT));
+
+		// ---when the SMS has been delivered---
+		registerReceiver(new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context arg0, Intent intent) {
+				Uri uri = (Uri) intent.getExtras().get(SMS_URI);
+				Context context = getBaseContext();
+				switch (getResultCode()) {
+				case Activity.RESULT_OK:
+					Toast.makeText(getBaseContext(), "SMS delivered",
+							Toast.LENGTH_SHORT).show();
+					 Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_COMPLETED);
+					break;
+				case Activity.RESULT_CANCELED:
+					Toast.makeText(getBaseContext(), "SMS not delivered",
+							Toast.LENGTH_SHORT).show();
+					 Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
+					break;
+				}
+			}
+		}, new IntentFilter(DELIVERED));
+		
 	}
 
 	@Override
@@ -152,9 +154,43 @@ public class ThreadActivity extends SherlockListActivity implements
 		switch(v.getId()) {
 		case R.id.bt_send: {
 			String message = mMessageEt.getText().toString();
+			
+			if (message == null || message.length() == 0) {
+				return;
+			}
+			
 			String phone = mList.get(0).address;
-						
-			Utility.sendSms(ThreadActivity.this, phone, message);
+			
+			SmsManager smsManager = SmsManager.getDefault();
+			// 如果短信没有超过限制长度，则返回一个长度的List。
+			List<String> texts = smsManager.divideMessage(message);
+
+			PendingIntent sentPI;
+			PendingIntent deliveredPI;
+			
+			for (String text : texts) {
+				Uri uri = Utility.saveSentSms(ThreadActivity.this, phone, text);
+				
+				String auth = uri.getAuthority();
+				String schema = uri.getScheme();
+				String host = uri.getHost();
+				int port = uri.getPort();
+				String path = uri.getPath();
+				SmsInfo sms = Utility.getASmsInfo(ThreadActivity.this, uri);
+				mAdapter.add(sms);
+				Intent intent = new Intent(SENT, uri);
+				intent.putExtra(SMS_URI, uri);
+				sentPI = PendingIntent.getBroadcast(ThreadActivity.this, 0,
+						intent, 0);
+			 
+				intent = new Intent(DELIVERED);
+				intent.putExtra(SMS_URI, uri);
+			    deliveredPI = PendingIntent.getBroadcast(ThreadActivity.this, 0,
+			    		new Intent(DELIVERED, uri), 0);
+				
+				smsManager.sendTextMessage(phone, null, text, sentPI, deliveredPI);
+			}
+			mAdapter.notifyDataSetChanged();
 			
 			mMessageEt.setText("");
 			mMessageEt.clearFocus();

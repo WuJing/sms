@@ -61,6 +61,15 @@ public class Utility {
 		return smsList;
 	}
 	
+	public static SmsInfo getASmsInfo(Context context, Uri uri) {
+		List<SmsInfo> list = getSmsInfo(context, uri, null, null, null);
+		if (list.size() > 0) {
+			return list.get(0);
+		}
+		return null;
+		
+	}
+	
 	public static List<SmsInfo> getSmsAll(Context context) {	
 		return getSmsInfo(context, Uri.parse(SmsInfo.SMS_URI_ALL), null, null, DEFAULT_SORT_ORDER);
 	}
@@ -146,36 +155,5 @@ public class Utility {
 		return context.getContentResolver().update(uri, values, null, null);
 	}
 	
-	public static int sendSms(Context context,String phone, String message) {
-
-		int ret = 0;
-		if (message == null || message.trim().length() == 0) {
-			return 0;
-		}
-			
-		SmsManager smsManager = SmsManager.getDefault();
-		// 如果短信没有超过限制长度，则返回一个长度的List。
-		List<String> texts = smsManager.divideMessage(message);
-
-		PendingIntent sentPI;
-		PendingIntent deliveredPI;
-		
-		for (String text : texts) {
-			Uri uri = saveSentSms(context, phone, text);
-			Intent intent = new Intent(ThreadActivity.SENT);
-			intent.setData(uri);
-			sentPI = PendingIntent.getBroadcast(context, 0,
-					intent, 0);
-		 
-			intent = new Intent(ThreadActivity.DELIVERED);
-			intent.setData(uri);
-		    deliveredPI = PendingIntent.getBroadcast(context, 0,
-		    		intent, 0);
-			
-			smsManager.sendTextMessage(phone, null, text, sentPI, deliveredPI);
-			ret++;
-		}
-		return ret;
-		
-	}
+	
 }
