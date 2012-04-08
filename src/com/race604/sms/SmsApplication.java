@@ -13,6 +13,7 @@ public class SmsApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 		mTheApp = SmsApplication.this;
+
 	}
 	
 	public static SmsApplication get() {

@@ -70,7 +70,7 @@ public class MainActivity extends SherlockListActivity implements OnGesturePerfo
     private boolean showAllMenu(Menu menu) {
     	boolean isLight = false;
     	menu.clear();
-    	menu.add(0, R.string.save, 0, R.string.save)
+    	menu.add(0, R.string.newsms, 0, R.string.newsms)
             .setIcon(isLight ? R.drawable.ic_compose_inverse : R.drawable.ic_compose)
             .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
@@ -85,8 +85,11 @@ public class MainActivity extends SherlockListActivity implements OnGesturePerfo
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch(id) {
-        case R.string.save:
+        case R.string.newsms: {
+        	Intent intent = new Intent(MainActivity.this, NewSmsActivity.class);
+        	startActivity(intent);
         	break;
+        }
         case R.string.search:
         	// mActionMode = startActionMode(new MainActivityActionMode());
         }

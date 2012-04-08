@@ -5,6 +5,7 @@
     <string name="app_name">SMS</string>
     <string name="headphoto">Head Photo</string>
     <string name="smshint">Input SMS</string>
+    <string name="addresshint">Input Contact</string>
     <string name="send">Send</string>
     
     <string name="me">I</string>
@@ -15,6 +16,8 @@
     <string name="save">Save</string>
     <string name="edit">Edit</string>
     <string name="search">Search</string>
+    <string name="newsms">New</string>
+    <string name="select">Select</string>
     
     <!-- SMS send hint -->
     <string name="sent">SMS was sent</string>

@@ -143,9 +143,10 @@ public class Utility {
 	
 	public static ContactInfo getCantactByPhone(Context context, String phone) {
 		String num = phone;
-		if (phone.startsWith("+86")) {
-			num = phone.substring(3);
-		} 
+		int len = phone.length();
+		if (len > 11) {
+			num = phone.substring(len - 11);
+		}
 
 		ContactInfo contact = new ContactInfo();
 		contact.displayName = num;

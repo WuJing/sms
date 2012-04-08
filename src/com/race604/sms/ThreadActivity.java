@@ -31,10 +31,6 @@ import com.race604.sms.model.Utility;
 public class ThreadActivity extends SherlockListActivity implements
 		OnClickListener {
 
-	public static String SENT = "SMS_SENT";
-	public static String DELIVERED = "SMS_DELIVERED";
-	public static String SMS_URI = "sms_uri";
-
 	private long thread_id;
 	private ThreadActivityAdapter mAdapter;
 	private ListView mSmsLv;
@@ -65,66 +61,6 @@ public class ThreadActivity extends SherlockListActivity implements
 		mSentBtn.setOnClickListener(this);
 
 		mMessageEt = (EditText) findViewById(R.id.et_smsinput);
-
-		// ---when the SMS has been sent---
-		registerReceiver(new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context arg0, Intent intent) {
-				Uri uri = intent.getParcelableExtra(SMS_URI);
-				Context context = getBaseContext();
-				switch (getResultCode()) {
-				case Activity.RESULT_OK:
-					Toast.makeText(context, R.string.sent, Toast.LENGTH_SHORT)
-							.show();
-					Utility.updateSmsStatus(context, uri,
-							SmsInfo.STATUS_PENDING);
-					break;
-				case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-					Toast.makeText(getBaseContext(), R.string.failure_generic,
-							Toast.LENGTH_SHORT).show();
-					Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
-					break;
-				case SmsManager.RESULT_ERROR_NO_SERVICE:
-					Toast.makeText(getBaseContext(),
-							R.string.failure_noservice, Toast.LENGTH_SHORT)
-							.show();
-					Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
-					break;
-				case SmsManager.RESULT_ERROR_NULL_PDU:
-					Toast.makeText(getBaseContext(), R.string.failure_nullpdu,
-							Toast.LENGTH_SHORT).show();
-					Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
-					break;
-				case SmsManager.RESULT_ERROR_RADIO_OFF:
-					Toast.makeText(getBaseContext(), R.string.failure_radiooff,
-							Toast.LENGTH_SHORT).show();
-					Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
-					break;
-				}
-			}
-		}, new IntentFilter(SENT));
-
-		// ---when the SMS has been delivered---
-		registerReceiver(new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context arg0, Intent intent) {
-				Uri uri = intent.getParcelableExtra(SMS_URI);
-				Context context = getBaseContext();
-				switch (getResultCode()) {
-				case Activity.RESULT_OK:
-					Toast.makeText(getBaseContext(), R.string.delivered,
-							Toast.LENGTH_SHORT).show();
-					Utility.updateSmsStatus(context, uri,
-							SmsInfo.STATUS_COMPLETED);
-					break;
-				case Activity.RESULT_CANCELED:
-					Toast.makeText(getBaseContext(), R.string.failure_canceled,
-							Toast.LENGTH_SHORT).show();
-					Utility.updateSmsStatus(context, uri, SmsInfo.STATUS_FAILED);
-					break;
-				}
-			}
-		}, new IntentFilter(DELIVERED));
 
 	}
 
@@ -178,14 +114,14 @@ public class ThreadActivity extends SherlockListActivity implements
 				SmsInfo sms = Utility.getASmsInfo(ThreadActivity.this, uri);
 				mAdapter.add(sms);
 				Bundle bundle = new Bundle();
-				bundle.putParcelable(SMS_URI, uri);
+				bundle.putParcelable(SmsSendStatusReceiver.SMS_URI, uri);
 				
-				Intent intent = new Intent(SENT);
+				Intent intent = new Intent(SmsSendStatusReceiver.SENT);
 				intent.putExtras(bundle);
 				sentPI = PendingIntent.getBroadcast(ThreadActivity.this, 0,
 						intent, PendingIntent.FLAG_UPDATE_CURRENT);
 				
-				intent = new Intent(DELIVERED);
+				intent = new Intent(SmsSendStatusReceiver.DELIVERED);
 				intent.putExtras(bundle);
 				deliveredPI = PendingIntent.getBroadcast(ThreadActivity.this,
 						0, intent, PendingIntent.FLAG_ONE_SHOT);
