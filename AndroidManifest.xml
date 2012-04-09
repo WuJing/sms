@@ -21,8 +21,17 @@
             android:theme="@style/Theme.Sherlock" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.dir/mms" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android-dir/mms-sms" />
             </intent-filter>
         </activity>
         
@@ -49,12 +58,26 @@
         </activity>
         
         <receiver android:name=".SmsReceiver">
-             <intent-filter> 
-                <action android:name="android.provider.Telephony.SMS_RECEIVED" /> 
-            </intent-filter> 
+            <intent-filter android:priority="2147483647">
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <!-- 
+            <intent-filter android:priority="2147483647">
+                <action android:name="android.provider.Telephony.WAP_PUSH_RECEIVED" />
+                <data android:mimeType="application/vnd.wap.mms-message" />
+            </intent-filter>
+            <intent-filter android:priority="2147483647">
+                <action android:name="com.android.mms.transaction.MESSAGE_SENT" />
+            </intent-filter>
+            <intent-filter android:priority="2147483647">
+                <action android:name="android.intent.action.CONTENT_CHANGED" />
+            </intent-filter>
+             -->
         </receiver>
         
-        <receiver android:name=".SmsSendStatusReceiver">
+        <receiver android:name=".SmsSendStatusReceiver" 
+            >
             <intent-filter> 
                 <action android:name="com.race604.sms.SENT" />
                 <action android:name="com.race604.sms.DELIVERED" /> 

@@ -9,10 +9,13 @@ import com.race604.sms.model.SmsThread;
 import com.race604.sms.model.Utility;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -53,6 +56,7 @@ public class MainActivityAdapter extends ArrayAdapter<SmsThread>{
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
+		final SmsThread thread = mThreadList.get(position);
 		View rowView = convertView;
 		if (rowView == null) {
 			LayoutInflater inflater = mContext.getLayoutInflater();
@@ -62,10 +66,10 @@ public class MainActivityAdapter extends ArrayAdapter<SmsThread>{
 			viewHolder.body = (TextView) rowView.findViewById(R.id.bodyTv);
 			viewHolder.photo = (ImageView) rowView.findViewById(R.id.headIv);
 			rowView.setTag(viewHolder);
+			
 		}
 		
 		ViewHolder holder = (ViewHolder) rowView.getTag();
-		SmsThread thread = mThreadList.get(position);
 		ContactInfo contact = Utility.getCantactByPhone(mContext, thread.latest.address);
 		String from = contact.displayName;
 		if (from == null) {

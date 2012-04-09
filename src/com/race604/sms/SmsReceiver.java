@@ -39,24 +39,26 @@ public class SmsReceiver extends BroadcastReceiver {
             }
             //---display the new SMS message---
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-            long thread_id = Utility.getASmsInfo(context, last).thread_id;
+            SmsInfo sms = Utility.getASmsInfo(context, last);
+            long thread_id = sms.thread_id;
             
             Context appContext = SmsApplication.get();
             NotificationManager notificationManager = (NotificationManager) appContext.getSystemService(Context.NOTIFICATION_SERVICE);
+            
             int icon = R.drawable.ic_notify_new;
             CharSequence tickerText = message;
             long when = System.currentTimeMillis();
             Notification notification = new Notification(icon, tickerText, when);
             notification.flags |= Notification.FLAG_AUTO_CANCEL;
             
-            CharSequence contentTitle = "Recived a new message";
+            CharSequence contentTitle = Utility.getCantactByPhone(appContext, sms.address).toString();
             CharSequence contentText = message;
             Intent notificationIntent = new Intent(appContext, ThreadActivity.class);
             notificationIntent.putExtra("id", thread_id);
             PendingIntent contentIntent = PendingIntent.getActivity(appContext, 0, notificationIntent, PendingIntent.FLAG_ONE_SHOT);
             
             notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
-            notificationManager.notify(NOTIFY_NEW_SMS_RECEIVED, notification);   
+            notificationManager.notify(NOTIFY_NEW_SMS_RECEIVED, notification);
 
             Activity curActivity = SmsApplication.get().getCurrentActivity();
             
@@ -74,6 +76,8 @@ public class SmsReceiver extends BroadcastReceiver {
 //            	threadItent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //            	context.startActivity(threadItent);
 //            }
+            // 禁止其他短信接收软件
+            abortBroadcast();
         }     
 		
 	}

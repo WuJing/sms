@@ -21,6 +21,7 @@ import android.gesture.GestureOverlayView.OnGesturePerformedListener;
 import android.gesture.Prediction;
 import android.graphics.Color;
 import android.graphics.RectF;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -183,8 +184,16 @@ public class MainActivity extends SherlockListActivity implements OnGesturePerfo
 
 	@Override
 	public void onItemClick(AdapterView<?> arg0, View view, int position, long arg3) {
-		Intent intent = new Intent(MainActivity.this, ThreadActivity.class);
 		SmsThread thread = mListAdapter.getItem(position);
+		Intent intent;
+		if(view.getId() == R.id.headIv) {
+			intent =new Intent("Intent.ACTION_CALL",Uri.parse("tel:"+thread.latest.address));
+			startActivity(intent);
+			return;
+		}
+		
+		intent = new Intent(MainActivity.this, ThreadActivity.class);
+		
 		intent.putExtra("id", thread.latest.thread_id);
 		startActivity(intent);
 	}
