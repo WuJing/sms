@@ -62,14 +62,14 @@ public class ThreadActivity extends SherlockListActivity implements
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.clear();
+		menu.add(0, R.string.call, 0, R.string.call)
+				.setIcon(R.drawable.ic_call)
+				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		menu.add(0, R.string.search, 0, R.string.search)
 				.setActionView(R.layout.action_search)
 				.setShowAsAction(
 						MenuItem.SHOW_AS_ACTION_IF_ROOM
 								| MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
-		menu.add(0, R.string.call, 0, R.string.call)
-				.setIcon(R.drawable.ic_call)
-				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		return true;
 	}
