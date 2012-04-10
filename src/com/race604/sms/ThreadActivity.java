@@ -30,6 +30,7 @@ public class ThreadActivity extends SherlockListActivity implements
 	private ListView mSmsLv;
 	private Button mSentBtn;
 	private EditText mMessageEt;
+	private String mPhone;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +67,9 @@ public class ThreadActivity extends SherlockListActivity implements
 				.setShowAsAction(
 						MenuItem.SHOW_AS_ACTION_IF_ROOM
 								| MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+		menu.add(0, R.string.call, 0, R.string.call)
+				.setIcon(R.drawable.ic_call)
+				.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		return true;
 	}
@@ -79,6 +83,11 @@ public class ThreadActivity extends SherlockListActivity implements
 			break;
 		case R.string.search:
 			break;
+		case R.string.call: {
+			Intent intent =new Intent(Intent.ACTION_CALL,Uri.parse("tel:"+mPhone));
+			startActivity(intent);
+			break;
+		}
 		}
 		return true;
 	}
@@ -152,13 +161,15 @@ public class ThreadActivity extends SherlockListActivity implements
 			mAdapter = new ThreadActivityAdapter(this, null);
 		}
 
+
 		List<SmsInfo> list = Utility.getSmsAllByThreadId(this, thread_id);
 		if (list.size() <= 0) {
 			finish();
 			return;
 		}
+		mPhone = Utility.getCleanPhone(list.get(0).address);
 		mAdapter.setContactName(Utility.getCantactByPhone(this,
-				list.get(0).address).displayName);
+				mPhone).displayName);
 
 		mAdapter.addAll(list);
 		mAdapter.notifyDataSetChanged();

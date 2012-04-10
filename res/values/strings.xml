@@ -18,6 +18,7 @@
     <string name="search">Search</string>
     <string name="newsms">New</string>
     <string name="select">Select</string>
+    <string name="call">Call</string>
     
     <!-- SMS send hint -->
     <string name="sent">SMS was sent</string>
