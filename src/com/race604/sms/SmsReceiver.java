@@ -7,12 +7,18 @@ import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
+import android.view.Gravity;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class SmsReceiver extends BroadcastReceiver {
@@ -60,16 +66,28 @@ public class SmsReceiver extends BroadcastReceiver {
             notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
             notificationManager.notify(NOTIFY_NEW_SMS_RECEIVED, notification);
 
+            TextView textView = new TextView(context);
+            textView.setText(message);
+            WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+                    WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
+                    WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
+                    PixelFormat.TRANSLUCENT);
+            params.gravity = Gravity.RIGHT | Gravity.TOP;
+            params.setTitle("Load Average");
+            WindowManager wm = (WindowManager) SmsApplication.get().getSystemService(Service.WINDOW_SERVICE);
+            wm.addView(textView, params);
+            
             Activity curActivity = SmsApplication.get().getCurrentActivity();
             
-            if (curActivity != null && curActivity instanceof ThreadActivity) {
-            	ThreadActivity threadAcitivity = (ThreadActivity)curActivity;
-            	if (thread_id == threadAcitivity.getThreadId()) {
-            		threadAcitivity.addSmsInfo(smsInfos[smsInfos.length-1]);
-            	} else {
-            		threadAcitivity.showThread(thread_id);
-            	}
-            } 
+//            if (curActivity != null && curActivity instanceof ThreadActivity) {
+//            	ThreadActivity threadAcitivity = (ThreadActivity)curActivity;
+//            	if (thread_id == threadAcitivity.getThreadId()) {
+//            		threadAcitivity.addSmsInfo(smsInfos[smsInfos.length-1]);
+//            	} else {
+//            		threadAcitivity.showThread(thread_id);
+//            	}
+//            } 
+            
 //            else {
 //            	Intent threadItent = new Intent(SmsApplication.get(), ThreadActivity.class);
 //            	threadItent.putExtra("id", thread_id);
@@ -77,7 +95,7 @@ public class SmsReceiver extends BroadcastReceiver {
 //            	context.startActivity(threadItent);
 //            }
             // 禁止其他短信接收软件
-            abortBroadcast();
+            // abortBroadcast();
         }     
 		
 	}
