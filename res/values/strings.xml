@@ -5,6 +5,7 @@
     <string name="app_name">SMS</string>
     <string name="headphoto">Head Photo</string>
     <string name="smshint">Input SMS</string>
+    <string name="addresshint">Input Contact</string>
     <string name="send">Send</string>
     
     <string name="me">I</string>
@@ -15,4 +16,16 @@
     <string name="save">Save</string>
     <string name="edit">Edit</string>
     <string name="search">Search</string>
+    <string name="newsms">New</string>
+    <string name="select">Select</string>
+    
+    <!-- SMS send hint -->
+    <string name="sent">SMS was sent</string>
+    <string name="delivered">SMS was delivered</string>
+    <string name="failure_generic">Generic failure</string>
+    <string name="failure_noservice">No service</string>
+    <string name="failure_nullpdu">Null PDU</string>
+    <string name="failure_radiooff">Radio off</string>
+    <string name="failure_canceled">SMS not delivered</string>
+
 </resources>

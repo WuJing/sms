@@ -7,11 +7,9 @@ import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.SubMenu;
 import com.race604.sms.model.SmsThread;
 import com.race604.sms.model.Utility;
 
-import android.app.ListActivity;
 import android.content.Intent;
 import android.gesture.Gesture;
 import android.gesture.GestureLibraries;
@@ -21,11 +19,11 @@ import android.gesture.GestureOverlayView.OnGesturePerformedListener;
 import android.gesture.Prediction;
 import android.graphics.Color;
 import android.graphics.RectF;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -36,7 +34,7 @@ public class MainActivity extends SherlockListActivity implements OnGesturePerfo
 	private ListView mThreadLv;
 	private GestureLibrary mGestureLib;
 	private View mCurrentView;
-	private ArrayAdapter<SmsThread> mListAdapter;
+	private MainActivityAdapter mListAdapter;
 	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,7 +68,7 @@ public class MainActivity extends SherlockListActivity implements OnGesturePerfo
     private boolean showAllMenu(Menu menu) {
     	boolean isLight = false;
     	menu.clear();
-    	menu.add(0, R.string.save, 0, R.string.save)
+    	menu.add(0, R.string.newsms, 0, R.string.newsms)
             .setIcon(isLight ? R.drawable.ic_compose_inverse : R.drawable.ic_compose)
             .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
@@ -85,8 +83,11 @@ public class MainActivity extends SherlockListActivity implements OnGesturePerfo
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch(id) {
-        case R.string.save:
+        case R.string.newsms: {
+        	Intent intent = new Intent(MainActivity.this, NewSmsActivity.class);
+        	startActivity(intent);
         	break;
+        }
         case R.string.search:
         	// mActionMode = startActionMode(new MainActivityActionMode());
         }
@@ -180,8 +181,11 @@ public class MainActivity extends SherlockListActivity implements OnGesturePerfo
 
 	@Override
 	public void onItemClick(AdapterView<?> arg0, View view, int position, long arg3) {
-		Intent intent = new Intent(MainActivity.this, ThreadActivity.class);
 		SmsThread thread = mListAdapter.getItem(position);
+		Intent intent;
+		
+		intent = new Intent(MainActivity.this, ThreadActivity.class);
+		
 		intent.putExtra("id", thread.latest.thread_id);
 		startActivity(intent);
 	}

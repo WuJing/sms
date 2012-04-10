@@ -1,14 +1,12 @@
 package com.race604.sms;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
-import java.util.zip.Inflater;
 
 import com.race604.sms.model.SmsInfo;
 
 import android.app.Activity;
-import android.content.Context;
 import android.text.format.Time;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,13 +24,21 @@ public class ThreadActivityAdapter  extends ArrayAdapter<SmsInfo>{
 	
 	public ThreadActivityAdapter(Activity context, List<SmsInfo> smsList) {
 		super(context, R.layout.thread_item, smsList);
-		mList = smsList;
+		if (smsList == null) {
+			mList = new ArrayList<SmsInfo>();
+		} else {
+			mList = smsList;
+		}
 		mContext = context;
 		mInflater = mContext.getLayoutInflater();
 	}
 	
 	public void setContactName(String name) {
 		mName = name;
+	}
+	
+	public String getContactName() {
+		return mName;
 	}
 	
 	@Override

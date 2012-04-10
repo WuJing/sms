@@ -2,8 +2,12 @@ package com.race604.sms;
 
 import java.util.List;
 
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
@@ -11,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
@@ -21,7 +26,6 @@ public class ThreadActivity extends SherlockListActivity implements
 		OnClickListener {
 
 	private long thread_id;
-	private List<SmsInfo> mList;
 	private ThreadActivityAdapter mAdapter;
 	private ListView mSmsLv;
 	private Button mSentBtn;
@@ -33,14 +37,16 @@ public class ThreadActivity extends SherlockListActivity implements
 
 		setContentView(R.layout.thread_activity);
 
-		thread_id = getIntent().getExtras().getLong("id");
-		mList = Utility.getSmsAllByThreadId(this, thread_id);
-		mAdapter = new ThreadActivityAdapter(this, mList);
-
-		if (mList.size() > 0) {
-			mAdapter.setContactName(Utility.getCantactByPhone(this,
-					mList.get(0).address).displayName);
+		thread_id = getIntent().getExtras().getLong("id", -1);
+		if (thread_id == -1) {
+			finish();
+			return;
 		}
+
+		showThread(thread_id);
+
+		ActionBar action_bar = getSupportActionBar();
+		action_bar.setTitle(mAdapter.getContactName());
 
 		mSmsLv = getListView();
 		mSmsLv.setAdapter(mAdapter);
@@ -49,6 +55,7 @@ public class ThreadActivity extends SherlockListActivity implements
 		mSentBtn.setOnClickListener(this);
 
 		mMessageEt = (EditText) findViewById(R.id.et_smsinput);
+
 	}
 
 	@Override
@@ -78,20 +85,95 @@ public class ThreadActivity extends SherlockListActivity implements
 
 	@Override
 	public void onClick(View v) {
-		switch(v.getId()) {
+		switch (v.getId()) {
 		case R.id.bt_send: {
 			String message = mMessageEt.getText().toString();
-			String phone = mList.get(0).address;
-			Utility.sendMms(ThreadActivity.this, phone, message);
-			
+
+			if (message == null || message.length() == 0) {
+				return;
+			}
+
+			String phone = mAdapter.getItem(0).address;
+
+			SmsManager smsManager = SmsManager.getDefault();
+			// 如果短信没有超过限制长度，则返回一个长度的List。
+			List<String> texts = smsManager.divideMessage(message);
+
+			PendingIntent sentPI;
+			PendingIntent deliveredPI;
+
+			for (String text : texts) {
+				Uri uri = Utility.saveSentSms(ThreadActivity.this, phone, text);
+
+				SmsInfo sms = Utility.getASmsInfo(ThreadActivity.this, uri);
+				mAdapter.add(sms);
+				Bundle bundle = new Bundle();
+				bundle.putParcelable(SmsSendStatusReceiver.SMS_URI, uri);
+				
+				Intent intent = new Intent(SmsSendStatusReceiver.SENT);
+				intent.putExtras(bundle);
+				sentPI = PendingIntent.getBroadcast(ThreadActivity.this, 0,
+						intent, PendingIntent.FLAG_UPDATE_CURRENT);
+				
+				intent = new Intent(SmsSendStatusReceiver.DELIVERED);
+				intent.putExtras(bundle);
+				deliveredPI = PendingIntent.getBroadcast(ThreadActivity.this,
+						0, intent, PendingIntent.FLAG_ONE_SHOT);
+
+				smsManager.sendTextMessage(phone, null, text, sentPI,
+						deliveredPI);
+			}
+			mAdapter.notifyDataSetChanged();
+
 			mMessageEt.setText("");
 			mMessageEt.clearFocus();
 			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 			imm.hideSoftInputFromWindow(mMessageEt.getWindowToken(), 0);
 			break;
 		}
-			
+
 		}
-		
+
 	}
+
+	public long getThreadId() {
+		return this.thread_id;
+	}
+
+	public void addSmsInfo(SmsInfo sms) {
+		mAdapter.add(sms);
+		mAdapter.notifyDataSetChanged();
+	}
+
+	public void showThread(long thread_id) {
+		this.thread_id = thread_id;
+
+		if (mAdapter == null) {
+			mAdapter = new ThreadActivityAdapter(this, null);
+		}
+
+		List<SmsInfo> list = Utility.getSmsAllByThreadId(this, thread_id);
+		if (list.size() <= 0) {
+			finish();
+			return;
+		}
+		mAdapter.setContactName(Utility.getCantactByPhone(this,
+				list.get(0).address).displayName);
+
+		mAdapter.addAll(list);
+		mAdapter.notifyDataSetChanged();
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		SmsApplication.get().setCurrentActivity(null);
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		SmsApplication.get().setCurrentActivity(ThreadActivity.this);
+	}
+
 }

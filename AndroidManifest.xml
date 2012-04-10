@@ -10,8 +10,10 @@
 	<uses-permission android:name="android.permission.READ_CONTACTS" />
 	<uses-permission android:name="android.permission.SEND_SMS" />
 	<uses-permission android:name="android.permission.WRITE_SMS" />
+	<uses-permission android:name="android.permission.RECEIVE_SMS" />
+	<uses-permission android:name="android.permission.CALL_PHONE" />
 	
-    <application
+    <application android:name=".SmsApplication"
         android:icon="@drawable/ic_sms"
         android:label="@string/app_name" >
         <activity
@@ -20,8 +22,17 @@
             android:theme="@style/Theme.Sherlock" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.dir/mms" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android-dir/mms-sms" />
             </intent-filter>
         </activity>
         
@@ -35,6 +46,44 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        
+        <activity
+            android:name=".NewSmsActivity"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Sherlock" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        
+        <receiver android:name=".SmsReceiver">
+            <intent-filter android:priority="2147483647">
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <!-- 
+            <intent-filter android:priority="2147483647">
+                <action android:name="android.provider.Telephony.WAP_PUSH_RECEIVED" />
+                <data android:mimeType="application/vnd.wap.mms-message" />
+            </intent-filter>
+            <intent-filter android:priority="2147483647">
+                <action android:name="com.android.mms.transaction.MESSAGE_SENT" />
+            </intent-filter>
+            <intent-filter android:priority="2147483647">
+                <action android:name="android.intent.action.CONTENT_CHANGED" />
+            </intent-filter>
+             -->
+        </receiver>
+        
+        <receiver android:name=".SmsSendStatusReceiver" 
+            >
+            <intent-filter> 
+                <action android:name="com.race604.sms.SENT" />
+                <action android:name="com.race604.sms.DELIVERED" /> 
+            </intent-filter> 
+        </receiver>
     </application>
 
 </manifest>
